@@ -26,6 +26,7 @@ Singin(){
     headers: {
       'Content-Type': 'application/json'
     },
+    credentials: 'include',
     body: JSON.stringify({
       name: this.name,
       mail: this.mail,
@@ -36,7 +37,7 @@ Singin(){
   .then(data => {
     console.log(data);
     if(data.msg){
-      // this.router.navigate(['home'],{state:{jwt: data.access_token}});
+        this.router.navigate(['home'],{state:{jwt: data.access_token}});
     }
   })
   .catch(error => {
