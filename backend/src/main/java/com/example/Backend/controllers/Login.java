@@ -7,9 +7,10 @@ import com.example.Backend.dto.User_dto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.Backend.config.Log;
+import com.example.Backend.config.Log;//Log.log.info("");
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,11 @@ public class Login {
     Login(Login_services login,Jwt jwt){
         this.login = login;
         this.jwt = jwt;
+    }
+
+    @GetMapping("/csrf-token")
+    public CsrfToken csrf(CsrfToken token) {
+        return token; // contains headerName, parameterName, and token value
     }
 
     @PostMapping("/signup")
@@ -55,19 +61,14 @@ public class Login {
     public Response refresh(@CookieValue(value = "token")String access_token){
         Response res = new Response();
         try {
-            boolean validity = jwt.extract_token(access_token);
-            if (validity) {
-                String refresh_token = jwt.refresh_Token(access_token);
-                res.setRefresh_token(refresh_token);
-                res.setMsg(true);
-                res.setMessage("token validated adn generated");
-                return res;
-            } else {
-                res.setMsg(false);
-                res.setMessage("token not validated");
-                return res;
-            }
-        }catch(Exception e){
+            String validity = jwt.extract_token(access_token);
+            Log.log.info("Validity: {}", validity);
+            String refresh_token = jwt.refresh_Token(access_token);
+            res.setRefresh_token(refresh_token);
+            res.setMsg(true);
+            res.setMessage("token validated adn generated");
+            return res;
+            }catch(Exception e){
             res.setMsg(false);
             res.setMessage(e.getMessage());
             return res;

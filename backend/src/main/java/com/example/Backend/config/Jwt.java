@@ -45,18 +45,17 @@ public class Jwt {
     }
 
     // Validate and parse token
-    public boolean extract_token(String token) {
+    public String extract_token(String token) {
         try {
-            Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
-            return true;
-        } catch (Exception e) {
 
-            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

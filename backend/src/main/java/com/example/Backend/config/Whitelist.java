@@ -16,7 +16,7 @@ public class Whitelist {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signin", "/signup").permitAll() // whitelist
+                        .requestMatchers("/signin", "/signup", "/csrf-token", "/refresh").permitAll() // whitelist
                         .anyRequest().authenticated() // everything else requires auth
                 );
 
