@@ -1,22 +1,24 @@
 package com.example.Backend.controllers;
 
 
-import com.example.Backend.config.Jwt;
-import com.example.Backend.dto.Response;
-import com.example.Backend.dto.User_dto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;//Log.log.info("");
+import org.springframework.web.bind.annotation.RestController;
 
-import com.example.Backend.config.Log;//Log.log.info("");
-import java.util.HashMap;
-import java.util.Map;
-
+import com.example.Backend.config.Jwt;
+import com.example.Backend.config.Log;
 import com.example.Backend.dto.Login_dto;
-import com.example.Backend.services.Login_services;
+import com.example.Backend.dto.Response;
+import com.example.Backend.dto.User_dto;
 import com.example.Backend.models.User;
+import com.example.Backend.services.Login_services;
 @RestController
 @RequestMapping("/")
 public class Login {
@@ -45,6 +47,7 @@ public class Login {
     public ResponseEntity<Response<User_dto>> signin(@RequestBody Login_dto user ){
         Response<User_dto> res=login.signin(user);
         String refreshToken=jwt.refresh_Token(res.getData().getId());
+        res.setRefresh_token(refreshToken);
         ResponseCookie cookie=ResponseCookie.from("token",refreshToken)
                 .httpOnly(true)
                 .secure(false)
@@ -57,14 +60,13 @@ public class Login {
                 .body(res);
     }
 
-    @GetMapping("/refresh")
-    public Response refresh(@CookieValue(value = "token")String access_token){
+    @GetMapping("/access")
+    public Response access(@CookieValue(value = "token")String refresh_token){
         Response res = new Response();
-        try {
-            String validity = jwt.extract_token(access_token);
-            Log.log.info("Validity: {}", validity);
-            String refresh_token = jwt.refresh_Token(access_token);
-            res.setRefresh_token(refresh_token);
+        try {Log.log.info("refresh_token: {}", refresh_token);
+            String userid = jwt.extract_token(refresh_token);
+            String access_Token = jwt.access_Token(userid);
+            res.setAccess_token(access_Token);
             res.setMsg(true);
             res.setMessage("token validated adn generated");
             return res;
