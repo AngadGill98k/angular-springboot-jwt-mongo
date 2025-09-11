@@ -1,23 +1,26 @@
 package com.example.Backend.controllers;
 
 
-import com.example.Backend.config.Jwt;
-import com.example.Backend.dto.Response;
-import com.example.Backend.dto.User_dto;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.Cookie;
-import com.example.Backend.config.Log;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.example.Backend.config.Jwt;
 import com.example.Backend.dto.Login_dto;
-import com.example.Backend.services.Login_services;
+import com.example.Backend.dto.Response;
+import com.example.Backend.dto.User_dto;
 import com.example.Backend.models.User;
+import com.example.Backend.services.Login_services;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/")
 public class Login {
@@ -42,14 +45,6 @@ public class Login {
 
         return token; // still return JSON if you want to debug
     }
-    @PostMapping("/signup")
-    public User signup(@RequestBody Login_dto user ){
-        System.out.println(user.toString());
-        Log.log.info("Signin attempt for user: {}", user.getMail());
-        User res = login.signup(user);
-        return res;
-    }
-
     @PostMapping("/signin")
     public ResponseEntity<Response<User_dto>> signin(@RequestBody Login_dto user ){
         Response<User_dto> res=login.signin(user);
@@ -67,10 +62,18 @@ public class Login {
                 .body(res);
     }
 
+    @PostMapping("/signup")
+    public User signup(@RequestBody Login_dto user ){
+        //Log.log.info("Signin attempt for user: {}", user.getMail());
+        User res = login.signup(user);
+        return res;
+    }
+
     @GetMapping("/access")
     public Response access(@CookieValue(value = "token")String refresh_token){
         Response res = new Response();
-        try {Log.log.info("refresh_token: {}", refresh_token);
+        try {
+//Log.log.info("refresh_token: {}", refresh_token);
             String userid = jwt.extract_token(refresh_token);
             String access_Token = jwt.access_Token(userid);
             res.setAccess_token(access_Token);

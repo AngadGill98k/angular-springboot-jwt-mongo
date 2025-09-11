@@ -1,6 +1,7 @@
 import { Component, } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Service } from '../service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,7 @@ toggle:boolean=false;
 // static jwt:String="";
 
 
-constructor(private router:Router){}
+constructor(private router:Router,private service:Service){}
 Singin(){
   console.log(this.name);
   console.log(this.pass);
@@ -34,10 +35,13 @@ Singin(){
     })
   })
   .then(response => response.json())
-  .then(data => {
+  .then(async data => {
     console.log(data);
     if(data.msg){
-        this.router.navigate(['home'],{state:{jwt: data.access_token}});
+      this.service.set_access_token(data.access_token); 
+      await this.service.csrf_token();
+      console.log(this.service.access_token,this.service.get_csrf());
+      this.router.navigate(['home']);
     }
   })
   .catch(error => {

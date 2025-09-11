@@ -1,16 +1,14 @@
 package com.example.Backend.services;
 
-import com.example.Backend.dto.User_dto;
-import com.example.Backend.repository.User_repo;
-import org.springframework.http.ResponseCookie;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-
-import com.example.Backend.dto.Login_dto;
-import com.example.Backend.models.User;
-import com.example.Backend.dto.Response;
 import com.example.Backend.config.Jwt;
+import com.example.Backend.dto.Login_dto;
+import com.example.Backend.dto.Response;
+import com.example.Backend.dto.User_dto;
+import com.example.Backend.models.User;
+import com.example.Backend.repository.User_repo;
 @Service
 public class Login_services {
     private User_repo user_repo;
