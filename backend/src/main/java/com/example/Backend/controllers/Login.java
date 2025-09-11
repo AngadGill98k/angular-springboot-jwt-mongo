@@ -1,24 +1,23 @@
 package com.example.Backend.controllers;
 
 
+import com.example.Backend.config.Jwt;
+import com.example.Backend.dto.Response;
+import com.example.Backend.dto.User_dto;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;//Log.log.info("");
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.Backend.config.Jwt;
+import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.Cookie;
 import com.example.Backend.config.Log;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.example.Backend.dto.Login_dto;
-import com.example.Backend.dto.Response;
-import com.example.Backend.dto.User_dto;
-import com.example.Backend.models.User;
 import com.example.Backend.services.Login_services;
+import com.example.Backend.models.User;
 @RestController
 @RequestMapping("/")
 public class Login {
@@ -31,10 +30,18 @@ public class Login {
     }
 
     @GetMapping("/csrf-token")
-    public CsrfToken csrf(CsrfToken token) {
-        return token; // contains headerName, parameterName, and token value
-    }
+    public CsrfToken csrf(CsrfToken token, HttpServletResponse response) {
+        // Create a cookie with the CSRF token value
+        Cookie cookie = new Cookie("XSRF-TOKEN", token.getToken());
+        cookie.setPath("/");                // available for all paths
+        cookie.setHttpOnly(false);          // must be false so Angular can read it
+        cookie.setSecure(true);             // true if using HTTPS
+        cookie.setMaxAge(-1);               // session cookie
 
+        response.addCookie(cookie);
+
+        return token; // still return JSON if you want to debug
+    }
     @PostMapping("/signup")
     public User signup(@RequestBody Login_dto user ){
         System.out.println(user.toString());
@@ -70,7 +77,7 @@ public class Login {
             res.setMsg(true);
             res.setMessage("token validated adn generated");
             return res;
-            }catch(Exception e){
+        }catch(Exception e){
             res.setMsg(false);
             res.setMessage(e.getMessage());
             return res;
